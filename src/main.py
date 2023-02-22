@@ -16,12 +16,15 @@ class Car_Cost(tk.Tk):
             self.main_frame = frame
             self.main_frame.pack(side = tk.LEFT)
 
-    def about_pressed(self):
+    def _about_pressed(self):
         self._change_main_frame_to(self.about_frame)
 
     def _choose_car_pressed(self):
         self._change_main_frame_to(self.car_choose_frame)
         #self.main_frame.refresh_offerings_data()
+
+    def _get_price_pressed(self):
+        self._change_main_frame_to(self.get_price_frame)
 
     def __init__(self, screenName: str = "Car Cost", baseName: str | None = None, className: str = " Car Cost", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
         super().__init__(screenName, baseName, className, useTk, sync, use)
@@ -30,10 +33,11 @@ class Car_Cost(tk.Tk):
 
         self.car_choose_frame = Car_Choose_Frame(self)
         self.about_frame = About_Frame(self)
+        self.get_price_frame = Get_Price_FrameManager(self)
 
         #Set up Buttons_Frame
         button_names = [ "About", "Choose car", "Get price", "Exit"]
-        button_actions = [self.about_pressed, self._choose_car_pressed, None, self.destroy]
+        button_actions = [self._about_pressed, self._choose_car_pressed, self._get_price_pressed, self.destroy]
         self.buttons_frame = Buttons_Frame(self, button_names, button_actions)
 
         #Display buttons frame

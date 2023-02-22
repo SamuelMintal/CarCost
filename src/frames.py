@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 import os
+from enum import Enum
 
 # Custom files import
 from scraper import *
@@ -120,17 +121,62 @@ class Car_Choose_Frame(tk.Frame):
 
 
 
-class Get_Price_Frame(tk.Frame):
+class Get_Price_FrameManager():
+
+    def pack_forget(self):
+        if(self.curr_frame is not None):
+            self.curr_frame.pack_forget()
+
+    def pack(self, side):
+        if(self.curr_frame is not None):
+            self.curr_frame.pack(side=side)
+            self.last_pack_side = side
+        
+    class State(Enum):
+        INITIAL = 0
+        NEIGHBOURS = 1
+        NEURALNETWORK = 2
+        NEIGHBOURS_FINISH = 3
+        NEURALNETWORK_FINISH = 4
 
     # Initial Frame where you choose source file and
     # method for price prediction
     class _Initial_Frame(tk.Frame):
-        def __init__(self, master) -> None:
+        def __init__(self, master, state_change_callback) -> None:
             super().__init__(master)
+            self.method_label = tk.Label(self, text="Choose method of choice:")
+            self.method_label.pack()
 
-        # depack all widgets
-        def depack(self):
+            self.next_button = tk.Button(self, text="Next", command=state_change_callback)
+            self.next_button.pack()
+
+        def get_data(self):
             pass
 
+
+
+    def _change_state(self):
+        if(self.state == self.State.INITIAL):
+            #TODO Decide on the selected method to which state go
+            #Then show relevant Frame via _set_frame(..., True)
+            pass
+    
+    def _set_frame(self, frame, also_pack=False):
+        if(self.curr_frame is not None):
+            self.curr_frame.pack_forget()
+
+        self.curr_frame = frame
+
+        if(also_pack):
+            self.curr_frame.pack()
+
     def __init__(self, master) -> None:
-        super().__init__(master)
+        self.state = self.State.INITIAL
+        self.curr_frame = None
+        self.last_pack_side = None
+
+        # Initialize all possible subframes
+        self.initial_frame = self._Initial_Frame(master, self._change_state)
+
+        # Set current frame as intial frame
+        self._set_frame(self.initial_frame)
