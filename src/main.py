@@ -2,10 +2,8 @@
 import tkinter as tk
 import numpy as np
 import tensorflow as tf
-
 # Custom files imports
 from frames import *
-
 
 
 class Car_Cost(tk.Tk):

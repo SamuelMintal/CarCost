@@ -1,5 +1,6 @@
 # 3rd party imports
 import tkinter as tk
+from tkinter import filedialog as fd 
 from tkinter import ttk
 import os
 from enum import Enum
@@ -141,24 +142,60 @@ class Get_Price_FrameManager():
 
     # Initial Frame where you choose source file and
     # method for price prediction
-    class _Initial_Frame(tk.Frame):
+    class _Initial_Frame(tk.Frame): #TODO enable next button when both file and method has been chosen
         def __init__(self, master, state_change_callback) -> None:
             super().__init__(master)
+            self.POSSIBLE_METHOD_NAMES = ["Neural Network", "k-nearest neighbours"]
+            self.filename = None
+            self.chosen_method = None
+
+            self.choose_file_label = tk.Label(self, text="Select data file:")
+            self.choose_file_label.grid(column=0, row=0)
+
+            self.choose_file_button = tk.Button(self, text="Press to select file", command=self._choose_file_pressed)
+            self.choose_file_button.grid(column=0, row=1)
+
+            self.chosen_file_label = tk.Label(self, text="No file chosen", fg="red")
+            self.chosen_file_label.grid(column=0, row=2)
+
             self.method_label = tk.Label(self, text="Choose method of choice:")
-            self.method_label.pack()
+            self.method_label.grid(column=1, row=0)
 
-            self.next_button = tk.Button(self, text="Next", command=state_change_callback)
-            self.next_button.pack()
+            self.method_combobox = ttk.Combobox(self, values=self.POSSIBLE_METHOD_NAMES, state="disabled")
+            self.method_combobox.bind("<<ComboboxSelected>>", self._chose_method)
+            self.method_combobox.grid(column=1, row=1)
 
+            self.next_button = tk.Button(self, text="Next", command=state_change_callback, state="disabled")
+            self.next_button.grid(column=0, row=3, columnspan=2)
+
+        # Should be called only after state_change_callback has been called
+        # Otherwise main contain Nones, which are invalid values
         def get_data(self):
-            pass
+            return self.filename, self.chosen_method
 
+        # Saves chosen method from Combobox and allows user to press next button
+        def _chose_method(self, event):
+            self.chosen_method = event.widget.get()            
+            self.next_button.config(state="normal")
 
+        # Prompts user to select .csv data file and saves it
+        # Then enables method's Combobox which when selected will at last unlock next button
+        def _choose_file_pressed(self):            
+            self.filename = fd.askopenfile(
+                title='Open data file',
+                initialdir= os.getcwd() + '/data/',
+                filetypes=(('.csv data files', '*.csv'),)
+            )          
+            # Display the selected file to the user
+            self.chosen_file_label.config(text=f"selected file {self.filename}", fg="green")        
+
+            self.method_combobox.config(state="enabled")
 
     def _change_state(self):
         if(self.state == self.State.INITIAL):
             #TODO Decide on the selected method to which state go
             #Then show relevant Frame via _set_frame(..., True)
+            print("leaving Initial state")
             pass
     
     def _set_frame(self, frame, also_pack=False):
