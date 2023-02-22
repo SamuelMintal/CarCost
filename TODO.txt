@@ -1,0 +1,2 @@
+DONE: Car_Choose_Frame should deselect invalid options (such as: Ferrari Octavia)
+TODO: Parser could return also number of offerings for concrete brand model pair
