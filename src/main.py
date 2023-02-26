@@ -27,7 +27,7 @@ class Car_Cost(tk.Tk):
     def __init__(self, screenName: str = "Car Cost", baseName: str | None = None, className: str = " Car Cost", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
         super().__init__(screenName, baseName, className, useTk, sync, use)
         FRAMES_PADDING_X = 10
-        FRAMES_PADDING_Y = 10                
+        FRAMES_PADDING_Y = 10
 
         self.car_choose_frame = Car_Choose_Frame(self)
         self.about_frame = About_Frame(self)

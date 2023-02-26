@@ -1,9 +1,12 @@
 # 3rd party imports
 import tkinter as tk
-from tkinter import filedialog as fd 
+from tkinter import filedialog as fd
+from tkinter import messagebox
 from tkinter import ttk
 import os
 from enum import Enum
+import pandas as pd
+
 
 # Custom files import
 from scraper import *
@@ -71,7 +74,7 @@ class Car_Choose_Frame(tk.Frame):
     def _change_state_to(self, state: str, text_color: str):
         self.state_label.config(text=state, fg=text_color)
 
-    #TODO start scrapeing and save it into data/brand_model.csv
+    # start scrapeing and save it into data/brand_model.csv
     def _start_scrape(self):
         brand = self.brand_combobox.get()
         model = self.model_combobox.get()
@@ -116,7 +119,7 @@ class Car_Choose_Frame(tk.Frame):
         # Construct scraper
         self.scraper = AutobazarEuScraper()
 
-        # TODO scraper button
+        # scraper button
         self.start_scrape_button = tk.Button(self, text="start scraping", command=self._start_scrape, state="disabled")
         self.start_scrape_button.pack(padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
@@ -143,7 +146,7 @@ class Get_Price_FrameManager():
 
     # Initial Frame where you choose source file and
     # method for price prediction
-    class _Initial_Frame(tk.Frame): #TODO enable next button when both file and method has been chosen
+    class _Initial_Frame(tk.Frame): # Enable next button when both file and method has been chosen
         def __init__(self, master, forward_state_change_callback) -> None:
             super().__init__(master)
             self.POSSIBLE_METHOD_NAMES = ["Neural Network", "k-nearest neighbours"]
@@ -188,20 +191,19 @@ class Get_Price_FrameManager():
                 filetypes=(('.csv data files', '*.csv'),)
             )          
             # Display the selected file to the user
-            self.chosen_file_label.config(text=f"selected file {self.filename}", fg="green")        
+            self.chosen_file_label.config(text=f"selected file {self.filename.name.split('/')[-1]}", fg="green")        
 
             self.method_combobox.config(state="enabled")
 
     # Frame for entering parameters of car which price we want to predict
     # Gets possible values of transmission and fuel from previously selected .csv file
     class _Car_Params_Frame(tk.Frame):
+
         def __init__(self, master, forward_state_change_callback, backward_state_change_callback, source_csv_file=None) -> None:
             super().__init__(master)
-
-            def next_pressed(self):
-                #Check if inputted data are valid
-                # if yes, call forward_state_change_callback
-                pass
+            #save callback for usage in self._next_pressed
+            self.forward_state_change_callback=forward_state_change_callback
+                
 
             # Construct all the widgets
             # And set them empty
@@ -243,7 +245,7 @@ class Get_Price_FrameManager():
             # Back and Next Buttons
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
             self.back_button.grid(column=0, row=6)
-            self.next_button = tk.Button(self, text="Next", command=forward_state_change_callback)
+            self.next_button = tk.Button(self, text="Next", command=self._next_pressed)
             self.next_button.grid(column=1, row=6)
 
             # Now set possible values for Comboboc widgets
@@ -261,24 +263,54 @@ class Get_Price_FrameManager():
             # Set the combobox widget possible values
             if(source_csv_file is None):
                 return
+            data = pd.read_csv(source_csv_file)
+            self.trans_type_combobox.config(values=list(data["trans"].unique()))
+            self.fuel_type_combobox.config(values=list(data["fuel"].unique()))
+            
+        def _next_pressed(self):
+            # Check if inputted data are valid
+            entered_man_year = self.manufacture_year_entry.get()
+            entered_mileage = self.mileage_entry.get()
+            entered_power = self.power_entry.get()
 
+            if(
+                entered_man_year.isnumeric() and int(entered_man_year) >= 0 and
+                entered_mileage.isnumeric() and int(entered_mileage) >= 0 and
+                entered_power.isnumeric() and int(entered_power) >= 0
+                ):
+                # Inputted data are valid
+                # Therefore call forward_state_change_callback
+                self.forward_state_change_callback()
+            else:
+                # Inputted data are invalid
+                # Therefore throw error and do not move forward
+                messagebox.showerror("Error", "invalid data entered into entries\nchange them to continue")
+                return            
 
 
     # Frame for choosing k-nearest neighbours method parameters
     class _Neighbours_Frame(tk.Frame):
-        def __init__(self, master) -> None:
+        def __init__(self, master, forward_state_change_callback, backward_state_change_callback) -> None:
             super().__init__(master)
+
+            self.forward_state_change_callback = forward_state_change_callback
 
             self.choose_k_label = tk.Label(self, text="Choose value of k:")
             self.choose_k_label.grid(column=0, row=0)
 
             self.k_value_entry = tk.Entry(self)
-            self.k_value_entry.grid(column=0, row=1)
+            self.k_value_entry.grid(column=1, row=0)
 
+            # Start button
             self.start_button = tk.Button(self, text="Start", command=self._start_pressed)
+            self.start_button.grid(column=1, row=1)
+            # Back button
+            self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
+            self.back_button.grid(column=0, row=1)
 
         def _start_pressed(self):
-            print("Start pressed")
+            #TODO Check if k is valid
+            self.forward_state_change_callback()
 
 
     def _change_state_backward(self):
@@ -287,6 +319,11 @@ class Get_Price_FrameManager():
                 print("State change: Car Params state -> Initial state")
                 self.state = self.State.INITIAL
                 self._set_frame(self.initial_frame, also_pack=True)
+            
+            case self.State.NEIGHBOURS:
+                print("State change: Neighbours state -> Car Params state")
+                self.state = self.State.CAR_PARAMS
+                self._set_frame(self.car_params_frame, also_pack=True)
 
 
     def _change_state_forward(self):
@@ -307,6 +344,8 @@ class Get_Price_FrameManager():
             case self.State.CAR_PARAMS:
                 if(self.chosen_method == "k-nearest neighbours"):
                     print("State change: Initial state -> Neighbours state")
+                    self.state = self.State.NEIGHBOURS
+                    self._set_frame(self.neighbours_frame, also_pack=True)
                 elif(self.chosen_method == "Neural Network"):
                     print("State change: Initial state -> NeuralNetwork state")
     
@@ -328,6 +367,6 @@ class Get_Price_FrameManager():
         # Initialize all possible subframes
         self.initial_frame = self._Initial_Frame(master, self._change_state_forward)
         self.car_params_frame = self._Car_Params_Frame(master, self._change_state_forward, self._change_state_backward)
-
+        self.neighbours_frame = self._Neighbours_Frame(master, self._change_state_forward, self._change_state_backward)
         # Set current frame as intial frame
         self._set_frame(self.initial_frame)

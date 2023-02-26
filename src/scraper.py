@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from requests.models import PreparedRequest
 
-import csv
+import pandas as pd
 import os
 
 
@@ -115,12 +115,9 @@ class AutobazarEuScraper():
             self.driver.get(current_url)
             
         # Scraping Ended
-        # Now save the result as .csv   
-        with open(save_name + ".csv", 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames = ["price", "year", "trans", "fuel", "km", "kw"])
-            writer.writeheader()
-            writer.writerows(scrape_result)
-        # Scrape function end
+        df = pd.DataFrame.from_dict(scrape_result)
+        df.to_csv(save_name + ".csv", header=True, index=False) 
+    
 
     def _update_url_with_params(self, url, params):
         req = PreparedRequest()
@@ -160,9 +157,8 @@ class AutobazarEuScraper():
             price_str = ""
 
         price_int = get_int_price_from_string(price_str)
-        #PASSED
-        #print(f"price_str = {price_str}")
         print(f"price_int = {price_int}")
+        return price_int
 
     def _get_listed_item_description_year(self, listed_item_description, timeout=5):   
 
