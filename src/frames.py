@@ -263,9 +263,11 @@ class Get_Price_FrameManager():
             # Set the combobox widget possible values
             if(source_csv_file is None):
                 return
+            print(source_csv_file) #TODO VYMAZ
             data = pd.read_csv(source_csv_file)
             self.trans_type_combobox.config(values=list(data["trans"].unique()))
             self.fuel_type_combobox.config(values=list(data["fuel"].unique()))
+            
             
         def _next_pressed(self):
             # Check if inputted data are valid
@@ -347,6 +349,7 @@ class Get_Price_FrameManager():
                     self.state = self.State.NEIGHBOURS
                     self._set_frame(self.neighbours_frame, also_pack=True)
                 elif(self.chosen_method == "Neural Network"):
+                    # TODO implement NN selection screen
                     print("State change: Initial state -> NeuralNetwork state")
     
     def _set_frame(self, frame, also_pack=False):
