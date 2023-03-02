@@ -189,9 +189,9 @@ class Get_Price_FrameManager():
                 title='Open data file',
                 initialdir= os.getcwd() + '/data/',
                 filetypes=(('.csv data files', '*.csv'),)
-            )          
+            ).name         
             # Display the selected file to the user
-            self.chosen_file_label.config(text=f"selected file {self.filename.name.split('/')[-1]}", fg="green")        
+            self.chosen_file_label.config(text=f"selected file {self.filename.split('/')[-1]}", fg="green")        
 
             self.method_combobox.config(state="enabled")
 
@@ -263,7 +263,6 @@ class Get_Price_FrameManager():
             # Set the combobox widget possible values
             if(source_csv_file is None):
                 return
-            print(source_csv_file) #TODO VYMAZ
             data = pd.read_csv(source_csv_file)
             self.trans_type_combobox.config(values=list(data["trans"].unique()))
             self.fuel_type_combobox.config(values=list(data["fuel"].unique()))
