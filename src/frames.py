@@ -150,7 +150,7 @@ class Get_Price_FrameManager():
         def __init__(self, master, forward_state_change_callback) -> None:
             super().__init__(master)
             self.POSSIBLE_METHOD_NAMES = ["Neural Network", "k-nearest neighbours"]
-            self.filename = None
+            self.file_path = None
             self.chosen_method = None
 
             self.choose_file_label = tk.Label(self, text="Select data file:")
@@ -175,7 +175,7 @@ class Get_Price_FrameManager():
         # Should be called only after state_change_callback has been called
         # Otherwise main contain Nones, which are invalid values
         def get_data(self):
-            return self.filename, self.chosen_method
+            return self.file_path, self.chosen_method
 
         # Saves chosen method from Combobox and allows user to press next button
         def _chose_method(self, event):
@@ -185,13 +185,13 @@ class Get_Price_FrameManager():
         # Prompts user to select .csv data file and saves it
         # Then enables method's Combobox which when selected will at last unlock next button
         def _choose_file_pressed(self):            
-            self.filename = fd.askopenfile(
+            self.file_path = fd.askopenfile(
                 title='Open data file',
                 initialdir= os.getcwd() + '/data/',
                 filetypes=(('.csv data files', '*.csv'),)
             ).name         
             # Display the selected file to the user
-            self.chosen_file_label.config(text=f"selected file {self.filename.split('/')[-1]}", fg="green")        
+            self.chosen_file_label.config(text=f"selected file {self.file_path.split('/')[-1]}", fg="green")        
 
             self.method_combobox.config(state="enabled")
 
@@ -335,12 +335,12 @@ class Get_Price_FrameManager():
             case self.State.INITIAL:
                 print("State change: Initial state -> Car Params state")
                 # Get data from initial frame
-                filename, self.chosen_method = self.curr_frame.get_data()
+                file_path, self.chosen_method = self.curr_frame.get_data()
                 # Change self.state and set values for new frame  
                 self.state = self.State.CAR_PARAMS
                 self._set_frame(self.car_params_frame, also_pack=True)
                 #And let it know .csv file in order for it to pull data from it
-                self.curr_frame.set_possible_vals(filename)
+                self.curr_frame.set_possible_vals(file_path)
 
             case self.State.CAR_PARAMS:
                 if(self.chosen_method == "k-nearest neighbours"):
