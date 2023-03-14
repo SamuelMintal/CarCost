@@ -10,6 +10,7 @@ import pandas as pd
 
 # Custom files import
 from scraper import *
+from predicors import *
 
 class Buttons_Frame(tk.Frame):
     def __init__(self, master, button_names: list = None, button_actions: list = None) -> None:
@@ -301,9 +302,10 @@ class Get_Price_FrameManager():
 
     # Frame for choosing k-nearest neighbours method parameters
     class _Neighbours_Frame(tk.Frame):
-        def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None) -> None:
+        def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None, file_path=None) -> None:
             super().__init__(master)
 
+            self.file_path = file_path
             self.car_to_predict = car_to_predict
             self.forward_state_change_callback = forward_state_change_callback
 
@@ -320,13 +322,19 @@ class Get_Price_FrameManager():
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
             self.back_button.grid(column=0, row=1)
 
-        def set_car_to_predict(self, car_to_predict):
+        def set_params(self, car_to_predict, file_path):
             self.car_to_predict = car_to_predict
+            self.file_path = file_path
 
         def _start_pressed(self):
             #TODO Check if k is valid and self.car_to_predict to be set
+            k_val = self.k_value_entry.get()
+            if(not(k_val.isnumeric() and int(k_val) > 0)):
+                messagebox.showerror("Error", "invalid k value entered \n change it to continue")
 
             #TODO run k-nearest neighbours algo and report its result.
+            predicted_price = K_nearest_neighbours.predict_price_of(self.car_to_predict, self.file_path, k=int(k_val))
+            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price} Euros.")
             self.forward_state_change_callback()
 
 
@@ -351,12 +359,12 @@ class Get_Price_FrameManager():
             case self.State.INITIAL:
                 print("State change: Initial state -> Car Params state")
                 # Get data from initial frame
-                file_path, self.chosen_method = self.curr_frame.get_data()
+                self.file_path, self.chosen_method = self.curr_frame.get_data()
                 # Change self.state and set values for new frame  
                 self.state = self.State.CAR_PARAMS
                 self._set_frame(self.car_params_frame, also_pack=True)
                 #And let it know .csv file in order for it to pull data from it
-                self.curr_frame.set_possible_vals(file_path)
+                self.curr_frame.set_possible_vals(self.file_path)
 
             case self.State.CAR_PARAMS:
                 entered_car = self.curr_frame.get_data()
@@ -364,7 +372,7 @@ class Get_Price_FrameManager():
                     print("State change: Initial state -> Neighbours state")
                     self.state = self.State.NEIGHBOURS
                     self._set_frame(self.neighbours_frame, also_pack=True)
-                    self.neighbours_frame.set_car_to_predict(entered_car)
+                    self.neighbours_frame.set_params(entered_car, self.file_path)
                 elif(self.chosen_method == "Neural Network"):
                     # TODO implement NN selection screen
                     print("State change: Initial state -> NeuralNetwork state")
@@ -383,6 +391,7 @@ class Get_Price_FrameManager():
         self.curr_frame = None
         self.last_pack_side = None
         self.chosen_method = None
+        self.file_path = None
 
         # Initialize all possible subframes
         self.initial_frame = self._Initial_Frame(master, self._change_state_forward)

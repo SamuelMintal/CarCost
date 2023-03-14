@@ -11,7 +11,7 @@ class K_nearest_neighbours:
         
     # Returns Euclidean distance between 2 dataframe entries ~ vehicles
     @staticmethod
-    def _euclid_distance(elem_1: pd.DataFrame, elem_2: pd.DataFrame):
+    def _distance(elem_1: pd.DataFrame, elem_2: pd.DataFrame):
         dist = 0
 
         for key in elem_1.keys():
@@ -21,8 +21,7 @@ class K_nearest_neighbours:
             if(key == "year" or key == "km" or key == "kw"):
                 weight = 1
             else:
-                weight = 0.1
-            
+                weight = 0.1            
 
             dist += weight * abs(elem_1[key] - elem_2[key])
 
@@ -53,7 +52,7 @@ class K_nearest_neighbours:
         res = []
         for _, data_entry in data_df.iterrows():
             res.append({
-                "dist": K_nearest_neighbours._euclid_distance(car_df.iloc[0], data_entry),
+                "dist": K_nearest_neighbours._distance(car_df.iloc[0], data_entry),
                 "price": data_entry["price"]
             })
 
@@ -79,7 +78,7 @@ class K_nearest_neighbours:
             
 
     @staticmethod
-    def predict_price_of(car_to_predict: dict, csv_file_path: str, infer_mode="WEIGHTED", k=1):
+    def predict_price_of(car_to_predict: dict, csv_file_path: str, infer_mode="WEIGHTED", k=3):
 
         # Firstly preprocess car_to_predict together with specified csv
         car_df, data_df = K_nearest_neighbours._preprocess_data(car_to_predict, csv_file_path)
