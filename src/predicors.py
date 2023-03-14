@@ -3,9 +3,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pandas as pd
 import numpy as np
-from enum import Enum
+import tensorflow as tf
 
 from csv_preprocessor import CsvPreprocessor
+
+
 
 class K_nearest_neighbours:
         
@@ -93,6 +95,77 @@ class K_nearest_neighbours:
         return expected_price
 
 
+class Neural_network_predictor:
+    
+    # neurons_layers is an array which whose len is number of layers and [i] is number of neurons in i-th layer
+    def __init__(self, neurons_layers, n_epochs, csv_file_path) -> None:
+        self.neurons_layers = neurons_layers
+        self.n_epochs = n_epochs
+        self.csv_file_path = csv_file_path
+        
+        self.trained = False
+        self.model = None
+
+    # Preprocesses the data
+    # Returns df of car_to_predict and csv_file
+    @staticmethod
+    def _preprocess_data(car_to_predict: dict, csv_file_path: str):
+        new_file_name = CsvPreprocessor.prefix_file_name_of(csv_file_path)
+
+        curr_path = CsvPreprocessor.drop_null_containing_rows(csv_file_path, new_file_name)
+        curr_path = CsvPreprocessor.add_car_to_predict(curr_path, car_to_predict)
+        curr_path = CsvPreprocessor.normalize_columns(curr_path)
+        curr_path = CsvPreprocessor.one_hot_encode_columns(curr_path)
+        curr_path, car_df = CsvPreprocessor.take_out_car_to_predict(curr_path)
+
+        return (car_df, CsvPreprocessor._get_df(curr_path))
+
+    def _set_specified_model(self, inputs_shape):
+        
+        inputs = tf.keras.Input(shape=inputs_shape)
+
+        x = inputs
+        for n_neurons in self.neurons_layers:
+            x = tf.keras.layers.Dense(units=n_neurons, activation="relu")(x)
+
+        outputs = tf.keras.layers.Dense(units=1, activation=None)(x)
+
+        self.model = tf.keras.Model(inputs=inputs, outputs=outputs)
+        self.model.compile(
+            optimizer=tf.keras.optimizers.Adam(
+                learning_rate=tf.keras.optimizers.schedules.CosineDecay(
+                    0.001, self.n_epochs,
+                )
+            ),
+            loss="mse",
+            metrics=["mae"]
+        )
+
+
+    # Trains self.model
+    def _train_network(self, dataset: np.array, targets: np.array):
+
+        self.model.fit(dataset, targets, epochs=self.n_epochs)
+        self.trained = True
+        
+    def predict_price_of(self, car_to_predict, retrain=False):
+
+        if(not self.trained or retrain):
+            # Firstly preprocess car_to_predict together with specified csv
+            car_df, data_df = Neural_network_predictor._preprocess_data(car_to_predict, self.csv_file_path)
+            inputs_shape = np.array(car_df).shape
+
+            # Now set and train the network on the dataset 
+            self._set_specified_model(inputs_shape)
+
+            prices = data_df.pop("price")
+            self._train_network(np.array(data_df), np.array(prices))
+
+        # Infer price based on the trained NN
+        expected_price = self.model([np.array(car_df)])[0]
+
+        # Return infered price
+        return expected_price
 
 
 
