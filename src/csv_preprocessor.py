@@ -42,7 +42,7 @@ class CsvPreprocessor:
      # Normalizes sepcified column values to [0,1] region
      # Returns file path to the saved file
      @staticmethod
-     def normalize_columns(file_path, save_name=None, normalize_columns=["price", "year", "km", "kw"]):
+     def normalize_columns(file_path, save_name=None, normalize_columns=["year", "km", "kw"]):
           df = CsvPreprocessor._get_df(file_path)
 
           if(normalize_columns != None):
@@ -92,7 +92,7 @@ class CsvPreprocessor:
      # Takes the car to predict from the dataset and returns it with the file path,
      # it also deletes column SPECIAL_COLUMN_NAME both from df and car
      @staticmethod
-     def take_car_to_predict(file_path, save_name=None):
+     def take_out_car_to_predict(file_path, save_name=None):
           df = CsvPreprocessor._get_df(file_path)
           SPECIAL_COLUMN_NAME = "IsCarToPredict"
 
@@ -103,10 +103,9 @@ class CsvPreprocessor:
 
 
 
-
 """
 def main():
-     # Just test
+     # Usage example
      sample_car = {
           "price": None,
           "year": 2014, 
