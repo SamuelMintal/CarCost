@@ -267,6 +267,16 @@ class Get_Price_FrameManager():
             self.trans_type_combobox.config(values=list(data["trans"].unique()))
             self.fuel_type_combobox.config(values=list(data["fuel"].unique()))
             
+        # Returns dictionary describing the entered car
+        def get_data(self):
+            return {
+                "price": None,
+                "year":  self.manufacture_year_entry.get(), 
+                "trans": self.trans_type_combobox.get(),
+                "fuel":  self.fuel_type_combobox.get(),
+                "km":    self.mileage_entry.get(),
+                "kw":   self.power_entry.get(),
+            }
             
         def _next_pressed(self):
             # Check if inputted data are valid
@@ -291,9 +301,10 @@ class Get_Price_FrameManager():
 
     # Frame for choosing k-nearest neighbours method parameters
     class _Neighbours_Frame(tk.Frame):
-        def __init__(self, master, forward_state_change_callback, backward_state_change_callback) -> None:
+        def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None) -> None:
             super().__init__(master)
 
+            self.car_to_predict = car_to_predict
             self.forward_state_change_callback = forward_state_change_callback
 
             self.choose_k_label = tk.Label(self, text="Choose value of k:")
@@ -309,8 +320,13 @@ class Get_Price_FrameManager():
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
             self.back_button.grid(column=0, row=1)
 
+        def set_car_to_predict(self, car_to_predict):
+            self.car_to_predict = car_to_predict
+
         def _start_pressed(self):
-            #TODO Check if k is valid
+            #TODO Check if k is valid and self.car_to_predict to be set
+
+            #TODO run k-nearest neighbours algo and report its result.
             self.forward_state_change_callback()
 
 
@@ -343,10 +359,12 @@ class Get_Price_FrameManager():
                 self.curr_frame.set_possible_vals(file_path)
 
             case self.State.CAR_PARAMS:
+                entered_car = self.curr_frame.get_data()
                 if(self.chosen_method == "k-nearest neighbours"):
                     print("State change: Initial state -> Neighbours state")
                     self.state = self.State.NEIGHBOURS
                     self._set_frame(self.neighbours_frame, also_pack=True)
+                    self.neighbours_frame.set_car_to_predict(entered_car)
                 elif(self.chosen_method == "Neural Network"):
                     # TODO implement NN selection screen
                     print("State change: Initial state -> NeuralNetwork state")

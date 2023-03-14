@@ -68,20 +68,63 @@ class CsvPreprocessor:
                df = pd.concat([df, one_hot_encoded], axis=1)
 
           return CsvPreprocessor._save_df(df, file_path, save_name)
+     
+     # Adds the car which price we will be predicting to the dataframe
+     # WARNING: Sets the car's price to None -> if we will call this before 
+     # drop_null_containing_rows our car will be drop
+     @staticmethod
+     def add_car_to_predict(file_path, car_dict, save_name=None):
+          df = CsvPreprocessor._get_df(file_path)
+          SPECIAL_COLUMN_NAME = "IsCarToPredict"
+
+          # Add column which will make it stand apart from the rest of the dataset
+          car_dict[SPECIAL_COLUMN_NAME] = True
+
+          # Now add the same column to the rest of the dataset 
+          # but with different value
+          df[SPECIAL_COLUMN_NAME] = False
+
+          # Now append the car to the augmented df
+          df = df.append(car_dict, ignore_index=True)
+
+          return CsvPreprocessor._save_df(df, file_path, save_name)
+     
+     # Takes the car to predict from the dataset and returns it with the file path,
+     # it also deletes column SPECIAL_COLUMN_NAME both from df and car
+     @staticmethod
+     def take_car_to_predict(file_path, save_name=None):
+          df = CsvPreprocessor._get_df(file_path)
+          SPECIAL_COLUMN_NAME = "IsCarToPredict"
+
+          car_df = df[df[SPECIAL_COLUMN_NAME]].drop(columns=[SPECIAL_COLUMN_NAME])
+          df = df[~df[SPECIAL_COLUMN_NAME]].drop(columns=[SPECIAL_COLUMN_NAME])
+
+          return CsvPreprocessor._save_df(df, file_path, save_name), car_df
+
 
 
 
 """
 def main():
      # Just test
+     sample_car = {
+          "price": None,
+          "year": 2014, 
+          "trans": "Automat", 
+          "fuel": "Diesel", 
+          "km": 356000, 
+          "kw": 77.0,
+     }
      abs_path = "C:/Users/samue/Desktop/Skola/others/CarCost/data/Audi_e-tron.csv"
      new_file_name = CsvPreprocessor.prefix_file_name_of(abs_path)
-     print(f"New file name is {new_file_name}")
 
      curr_path = CsvPreprocessor.drop_null_containing_rows(abs_path, new_file_name)
+     curr_path = CsvPreprocessor.add_car_to_predict(curr_path, sample_car)
      curr_path = CsvPreprocessor.normalize_columns(curr_path)
      curr_path = CsvPreprocessor.one_hot_encode_columns(curr_path)
 
+     curr_path, car_df = CsvPreprocessor.take_car_to_predict(curr_path)
+     print(car_df)
      
 
 if __name__ == "__main__":
