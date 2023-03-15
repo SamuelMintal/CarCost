@@ -39,9 +39,16 @@ class About_Frame(tk.Frame):
     def __init__(self, master) -> None:
         super().__init__(master)
 
-        about_text = "TODO: how to use program text"
+        about_text = \
+        "1. Scrape the data on frame accessed by clicking on Choose Car button.\n\
+            You can always watch the scraping process on the Chrome tab the program opens with.\n\
+        2.) Then press Get price button and choose from which file ~ car model you want\n\
+            to predict price. Then choose desired method and continue filling the fields \n\
+        3.) until you get window with the predicted price of your entered car.\n\
+        4.) As you are now done you can exit the program by pressing Exit button"
+        
         self.about_label = tk.Label(self, text=about_text)
-        self.about_label.pack(padx=50, pady=50)
+        self.about_label.pack(padx=10, pady=10)
     
 
 
@@ -327,16 +334,72 @@ class Get_Price_FrameManager():
             self.file_path = file_path
 
         def _start_pressed(self):
-            #TODO Check if k is valid and self.car_to_predict to be set
+            # Check if k is valid and self.car_to_predict to be set
             k_val = self.k_value_entry.get()
             if(not(k_val.isnumeric() and int(k_val) > 0)):
                 messagebox.showerror("Error", "invalid k value entered \n change it to continue")
 
-            #TODO run k-nearest neighbours algo and report its result.
+            # Run k-nearest neighbours algo and report its result.
             predicted_price = K_nearest_neighbours.predict_price_of(self.car_to_predict, self.file_path, k=int(k_val))
             messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price} Euros.")
             self.forward_state_change_callback()
 
+    # Frame for setting and running neural network predictor
+    class _Neural_Network_Frame(tk.Frame):
+        def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None, file_path=None) -> None:
+            super().__init__(master)
+            self.forward_state_change_callback = forward_state_change_callback
+            self.car_to_predict = car_to_predict
+            self.file_path = file_path
+
+            self.architecture_label = tk.Label(self, text="Enter NN architecture as sequence of space separated positive numbers")
+            self.architecture_label.grid(row=0, column=0, columnspan=2)
+
+            self.architecture_entry = tk.Entry(self, text="")
+            self.architecture_entry.grid(row=1, column=0, columnspan=2)
+
+            self.epochs_label = tk.Label(self, text="Enter number of epochs for NN to be trained for")
+            self.epochs_label.grid(row=2, column=0, columnspan=2)
+
+            self.epochs_entry = tk.Entry(self, text="")
+            self.epochs_entry.grid(row=3, column=0, columnspan=2)
+
+            self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
+            self.back_button.grid(column=0, row=4)
+            self.start_button = tk.Button(self, text="Start", command=self._start_pressed)
+            self.start_button.grid(column=1, row=4)
+
+        def set_params(self, car_to_predict, file_path):
+            self.car_to_predict = car_to_predict
+            self.file_path = file_path
+
+        def _start_pressed(self):
+            entered_arch = self.architecture_entry.get().split()
+            if(len(entered_arch) == 0):
+                messagebox.showerror("Error", "invalid architecture entered \n it needs to be nonzero length. Change it to continue")
+                return
+            
+            res_arch = []
+            for n_neurons in entered_arch:
+                if(str.isnumeric(n_neurons) and int(n_neurons) > 0):
+                    res_arch.append(int(n_neurons))
+                else:
+                    messagebox.showerror("Error", "invalid architecture entered \n all values needs to be positive numbers. Change it to continue")
+                    return
+                
+            n_epochs = self.epochs_entry.get()
+            if(str.isnumeric(n_epochs) and int(n_epochs) > 0):
+                n_epochs = int(n_epochs)
+            else:
+                messagebox.showerror("Error", "invalid epochs entered \n it needs to be positive number. Change it to continue")
+                return
+                
+            # Now that I have all the values checked I can run the NN predictor
+            nn_predictor = Neural_network_predictor(res_arch, n_epochs, self.file_path)
+            predicted_price = nn_predictor.predict_price_of(self.car_to_predict)
+            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price} Euros.")
+
+            self.forward_state_change_callback()
 
     def _change_state_backward(self):
         match self.state:
@@ -350,6 +413,10 @@ class Get_Price_FrameManager():
                 self.state = self.State.CAR_PARAMS
                 self._set_frame(self.car_params_frame, also_pack=True)
 
+            case self.State.NEURALNETWORK:
+                print("State change: Neural Network state -> Car Params state")
+                self.state = self.State.CAR_PARAMS
+                self._set_frame(self.car_params_frame, also_pack=True)
 
     def _change_state_forward(self):
         # Decide to which state go
@@ -369,13 +436,16 @@ class Get_Price_FrameManager():
             case self.State.CAR_PARAMS:
                 entered_car = self.curr_frame.get_data()
                 if(self.chosen_method == "k-nearest neighbours"):
-                    print("State change: Initial state -> Neighbours state")
+                    print("State change: Car Params state -> Neighbours state")
                     self.state = self.State.NEIGHBOURS
                     self._set_frame(self.neighbours_frame, also_pack=True)
                     self.neighbours_frame.set_params(entered_car, self.file_path)
                 elif(self.chosen_method == "Neural Network"):
-                    # TODO implement NN selection screen
-                    print("State change: Initial state -> NeuralNetwork state")
+                    print("State change: Car Param state -> Neural Network state")
+                    self.state = self.State.NEURALNETWORK
+                    self._set_frame(self.nn_frame, also_pack=True)
+                    self.nn_frame.set_params(entered_car, self.file_path)
+                    
     
     def _set_frame(self, frame, also_pack=False):
         if(self.curr_frame is not None):
@@ -397,5 +467,6 @@ class Get_Price_FrameManager():
         self.initial_frame = self._Initial_Frame(master, self._change_state_forward)
         self.car_params_frame = self._Car_Params_Frame(master, self._change_state_forward, self._change_state_backward)
         self.neighbours_frame = self._Neighbours_Frame(master, self._change_state_forward, self._change_state_backward)
+        self.nn_frame = self._Neural_Network_Frame(master, self._change_state_forward, self._change_state_backward)
         # Set current frame as intial frame
         self._set_frame(self.initial_frame)
