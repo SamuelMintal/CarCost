@@ -46,9 +46,9 @@ class Car_Cost(tk.Tk):
 
 
 
-def main():
+def k_nearest_main():
     car_cost_app = Car_Cost()
     car_cost_app.mainloop()
 
 if __name__ == "__main__":
-    main()
+    k_nearest_main()

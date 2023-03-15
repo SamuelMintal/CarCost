@@ -98,7 +98,7 @@ class K_nearest_neighbours:
 class Neural_network_predictor:
     
     # neurons_layers is an array which whose len is number of layers and [i] is number of neurons in i-th layer
-    def __init__(self, neurons_layers, n_epochs, csv_file_path) -> None:
+    def __init__(self, neurons_layers: list, n_epochs: int, csv_file_path: str) -> None:
         self.neurons_layers = neurons_layers
         self.n_epochs = n_epochs
         self.csv_file_path = csv_file_path
@@ -148,12 +148,16 @@ class Neural_network_predictor:
         self.model.fit(dataset, targets, epochs=self.n_epochs)
         self.trained = True
         
-    def predict_price_of(self, car_to_predict, retrain=False):
+    def predict_price_of(self, car_to_predict: dict, retrain=False):
 
         if(not self.trained or retrain):
             # Firstly preprocess car_to_predict together with specified csv
             car_df, data_df = Neural_network_predictor._preprocess_data(car_to_predict, self.csv_file_path)
-            inputs_shape = np.array(car_df).shape
+            
+            # Remove the price column and convert it to np.array
+            car_df.pop("price")
+            car_df = np.array(car_df)[0]
+            inputs_shape = np.squeeze(car_df).shape
 
             # Now set and train the network on the dataset 
             self._set_specified_model(inputs_shape)
@@ -162,14 +166,39 @@ class Neural_network_predictor:
             self._train_network(np.array(data_df), np.array(prices))
 
         # Infer price based on the trained NN
-        expected_price = self.model([np.array(car_df)])[0]
+        expected_price = np.squeeze(self.model(np.array([car_df])).numpy())
 
         # Return infered price
         return expected_price
 
 
 
-def main():
+
+
+def nn_main():
+    # True params from dataset
+    # 20990.0,2019,Manuál,Benzín,21600.0,96.0
+    sample_car = {
+          "price": None,
+          "year": 2019, 
+          "trans": "Manuál", 
+          "fuel": "Benzín", 
+          "km": 21600.0, 
+          "kw": 96.0,
+    }
+
+    abs_path = "C:/Users/samue/Desktop/Skola/others/CarCost/data/Volkswagen_Golf (Všetky modely).csv"
+    arch = [250 for _ in range(10)]
+    epochs = 64
+
+    nn_predictor = Neural_network_predictor(arch, epochs, abs_path)
+    predicted_price = nn_predictor.predict_price_of(sample_car)
+    print(f"Predicted price is {predicted_price}")
+
+
+
+
+def k_nearest_main():
     # Usage example
 
     # True params from dataset
@@ -191,4 +220,5 @@ def main():
     print(f"Predicted price with infer_mode=AVG and k=5 is {predicted_price}")
 
 if __name__ == "__main__":
-    main()
+    nn_main()
+    k_nearest_main()
