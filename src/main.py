@@ -17,7 +17,7 @@ class Car_Cost(tk.Tk):
     def _about_pressed(self):
         self._change_main_frame_to(self.about_frame)
 
-    def _choose_car_pressed(self):
+    def _choose_car_pressed(self):      
         self._change_main_frame_to(self.car_choose_frame)
         #self.main_frame.refresh_offerings_data()
 

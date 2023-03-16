@@ -348,7 +348,7 @@ class Get_Price_FrameManager():
 
             # Run k-nearest neighbours algo and report its result.
             predicted_price = K_nearest_neighbours.predict_price_of(self.car_to_predict, self.file_path, k=int(k_val))
-            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price} Euros.")
+            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price:.2f} Euros.")
             self.forward_state_change_callback()
 
     # Frame for setting and running neural network predictor
@@ -407,7 +407,7 @@ class Get_Price_FrameManager():
             # Now that I have all the values checked I can run the NN predictor
             nn_predictor = Neural_network_predictor(res_arch, n_epochs, self.file_path)
             predicted_price = nn_predictor.predict_price_of(self.car_to_predict)
-            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price} Euros.")
+            messagebox.showinfo("Result", f"Predicted price of the entered car is {predicted_price:.2f} Euros.")
 
             self.forward_state_change_callback()
 
