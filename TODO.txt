@@ -2,5 +2,5 @@ DONE: Car_Choose_Frame should deselect invalid options (such as: Ferrari Octavia
 TODO: Parser could return also number of offerings for concrete brand model pair. 
       Based on that maybe recommend which prediction method to use... if small amount of examples -> k-nearest neighbours...
 TODO: Force predictors to delete their augmented dataset files
-TODO: Add margins to the GUI so it looks at least a bit reasonable
+DONE: Add paddings to the GUI so it looks at least a bit reasonable
 TODO: Upgrade scraper so it can cope with "moznost odcitania dph" in price

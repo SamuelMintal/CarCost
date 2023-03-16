@@ -40,12 +40,12 @@ class About_Frame(tk.Frame):
         super().__init__(master)
 
         about_text = \
-        "1. Scrape the data on frame accessed by clicking on Choose Car button.\n\
-            You can always watch the scraping process on the Chrome tab the program opens with.\n\
-        2.) Then press Get price button and choose from which file ~ car model you want\n\
-            to predict price. Then choose desired method and continue filling the fields \n\
-        3.) until you get window with the predicted price of your entered car.\n\
-        4.) As you are now done you can exit the program by pressing Exit button"
+        "1. Scrape the data on frame accessed by clicking on \"Choose Car\" button.\n\
+You can always watch the scraping process on the Chrome tab the program opens with.\n\
+2.) Then press \"Get Price\" button and choose from which file ~ car model you want\n\
+to predict price. Then choose desired prediction method and continue filling the fields \n\
+3.) until you get window with the predicted price of the car you entered.\n\
+4.) As you are now done you can exit the program by pressing \"Exit\" button"
         
         self.about_label = tk.Label(self, text=about_text)
         self.about_label.pack(padx=10, pady=10)
@@ -161,24 +161,27 @@ class Get_Price_FrameManager():
             self.file_path = None
             self.chosen_method = None
 
+            WIDGETS_PADDING_X = 5
+            WIDGETS_PADDING_Y = 5 
+
             self.choose_file_label = tk.Label(self, text="Select data file:")
-            self.choose_file_label.grid(column=0, row=0)
+            self.choose_file_label.grid(column=0, row=0, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.choose_file_button = tk.Button(self, text="Press to select file", command=self._choose_file_pressed)
-            self.choose_file_button.grid(column=0, row=1)
+            self.choose_file_button.grid(column=0, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.chosen_file_label = tk.Label(self, text="No file chosen", fg="red")
-            self.chosen_file_label.grid(column=0, row=2)
+            self.chosen_file_label.grid(column=0, row=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.method_label = tk.Label(self, text="Choose method of choice:")
-            self.method_label.grid(column=1, row=0)
+            self.method_label.grid(column=1, row=0, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.method_combobox = ttk.Combobox(self, values=self.POSSIBLE_METHOD_NAMES, state="disabled")
             self.method_combobox.bind("<<ComboboxSelected>>", self._chose_method)
-            self.method_combobox.grid(column=1, row=1)
+            self.method_combobox.grid(column=1, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.next_button = tk.Button(self, text="Next", command=forward_state_change_callback, state="disabled")
-            self.next_button.grid(column=0, row=3, columnspan=2)
+            self.next_button.grid(column=0, row=3, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
         # Should be called only after state_change_callback has been called
         # Otherwise main contain Nones, which are invalid values
@@ -209,52 +212,54 @@ class Get_Price_FrameManager():
 
         def __init__(self, master, forward_state_change_callback, backward_state_change_callback, source_csv_file=None) -> None:
             super().__init__(master)
+            WIDGETS_PADDING_X = 5
+            WIDGETS_PADDING_Y = 5 
+
             #save callback for usage in self._next_pressed
             self.forward_state_change_callback=forward_state_change_callback
                 
-
             # Construct all the widgets
             # And set them empty
 
             # Instruction's widgets
             self.instruction_label = tk.Label(self, text="Now enter the parameters of car which price you want to estimate")
-            self.instruction_label.grid(column=0, row=0, columnspan=2)
+            self.instruction_label.grid(column=0, row=0, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Manufacture year widgets
             self.manufacture_year_label = tk.Label(self, text="Enter the year of manufacture:")
-            self.manufacture_year_label.grid(column=0, row=1)
+            self.manufacture_year_label.grid(column=0, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.manufacture_year_entry = tk.Entry(self)
-            self.manufacture_year_entry.grid(column=1, row=1)
+            self.manufacture_year_entry.grid(column=1, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Transmission type widgets
             self.trans_type_label = tk.Label(self, text="Enter transmission type:")
-            self.trans_type_label.grid(column=0, row=2)
+            self.trans_type_label.grid(column=0, row=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.trans_type_combobox = ttk.Combobox(self, values=[])
-            self.trans_type_combobox.grid(column=1, row=2)
+            self.trans_type_combobox.grid(column=1, row=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Fuel type widgets
             self.fuel_type_label = tk.Label(self, text="Enter fuel type:")
-            self.fuel_type_label.grid(column=0, row=3)
+            self.fuel_type_label.grid(column=0, row=3, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.fuel_type_combobox = ttk.Combobox(self, values=[])
-            self.fuel_type_combobox.grid(column=1, row=3)
+            self.fuel_type_combobox.grid(column=1, row=3, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Mileage widgets
             self.mileage_label = tk.Label(self, text="Enter the mileage:")
-            self.mileage_label.grid(column=0, row=4)
+            self.mileage_label.grid(column=0, row=4, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.mileage_entry = tk.Entry(self)
-            self.mileage_entry.grid(column=1, row=4)
+            self.mileage_entry.grid(column=1, row=4, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Power (kw) widgets
             self.power_label = tk.Label(self, text="Enter power (kw):")
-            self.power_label.grid(column=0, row=5)
+            self.power_label.grid(column=0, row=5, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.power_entry = tk.Entry(self)
-            self.power_entry.grid(column=1, row=5)
+            self.power_entry.grid(column=1, row=5, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Back and Next Buttons
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
-            self.back_button.grid(column=0, row=6)
+            self.back_button.grid(column=0, row=6, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.next_button = tk.Button(self, text="Next", command=self._next_pressed)
-            self.next_button.grid(column=1, row=6)
+            self.next_button.grid(column=1, row=6, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Now set possible values for Comboboc widgets
             # And clear Entry widgets
@@ -311,23 +316,25 @@ class Get_Price_FrameManager():
     class _Neighbours_Frame(tk.Frame):
         def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None, file_path=None) -> None:
             super().__init__(master)
+            WIDGETS_PADDING_X = 5
+            WIDGETS_PADDING_Y = 5 
 
             self.file_path = file_path
             self.car_to_predict = car_to_predict
             self.forward_state_change_callback = forward_state_change_callback
 
             self.choose_k_label = tk.Label(self, text="Choose value of k:")
-            self.choose_k_label.grid(column=0, row=0)
+            self.choose_k_label.grid(column=0, row=0, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.k_value_entry = tk.Entry(self)
-            self.k_value_entry.grid(column=1, row=0)
+            self.k_value_entry.grid(column=1, row=0, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             # Start button
             self.start_button = tk.Button(self, text="Start", command=self._start_pressed)
-            self.start_button.grid(column=1, row=1)
+            self.start_button.grid(column=1, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             # Back button
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
-            self.back_button.grid(column=0, row=1)
+            self.back_button.grid(column=0, row=1, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
         def set_params(self, car_to_predict, file_path):
             self.car_to_predict = car_to_predict
@@ -348,26 +355,29 @@ class Get_Price_FrameManager():
     class _Neural_Network_Frame(tk.Frame):
         def __init__(self, master, forward_state_change_callback, backward_state_change_callback, car_to_predict=None, file_path=None) -> None:
             super().__init__(master)
+            WIDGETS_PADDING_X = 5
+            WIDGETS_PADDING_Y = 5 
+
             self.forward_state_change_callback = forward_state_change_callback
             self.car_to_predict = car_to_predict
             self.file_path = file_path
 
             self.architecture_label = tk.Label(self, text="Enter NN architecture as sequence of space separated positive numbers")
-            self.architecture_label.grid(row=0, column=0, columnspan=2)
+            self.architecture_label.grid(row=0, column=0, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.architecture_entry = tk.Entry(self, text="")
-            self.architecture_entry.grid(row=1, column=0, columnspan=2)
+            self.architecture_entry.grid(row=1, column=0, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.epochs_label = tk.Label(self, text="Enter number of epochs for NN to be trained for")
-            self.epochs_label.grid(row=2, column=0, columnspan=2)
+            self.epochs_label.grid(row=2, column=0, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.epochs_entry = tk.Entry(self, text="")
-            self.epochs_entry.grid(row=3, column=0, columnspan=2)
+            self.epochs_entry.grid(row=3, column=0, columnspan=2, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
             self.back_button = tk.Button(self, text="Back", command=backward_state_change_callback)
-            self.back_button.grid(column=0, row=4)
+            self.back_button.grid(column=0, row=4, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
             self.start_button = tk.Button(self, text="Start", command=self._start_pressed)
-            self.start_button.grid(column=1, row=4)
+            self.start_button.grid(column=1, row=4, padx=WIDGETS_PADDING_X, pady=WIDGETS_PADDING_Y)
 
         def set_params(self, car_to_predict, file_path):
             self.car_to_predict = car_to_predict

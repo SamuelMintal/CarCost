@@ -34,7 +34,7 @@ class Car_Cost(tk.Tk):
         self.get_price_frame = Get_Price_FrameManager(self)
 
         #Set up Buttons_Frame
-        button_names = [ "About", "Choose car", "Get price", "Exit"]
+        button_names = [ "About", "Choose Car", "Get Price", "Exit"]
         button_actions = [self._about_pressed, self._choose_car_pressed, self._get_price_pressed, self.destroy]
         self.buttons_frame = Buttons_Frame(self, button_names, button_actions)
 
