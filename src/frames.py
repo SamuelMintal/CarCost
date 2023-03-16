@@ -204,7 +204,7 @@ class Get_Price_FrameManager():
             # Display the selected file to the user
             self.chosen_file_label.config(text=f"selected file {self.file_path.split('/')[-1]}", fg="green")        
 
-            self.method_combobox.config(state="enabled")
+            self.method_combobox.config(state="readonly")
 
     # Frame for entering parameters of car which price we want to predict
     # Gets possible values of transmission and fuel from previously selected .csv file

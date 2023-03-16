@@ -85,7 +85,6 @@ price,year,trans,fuel,km,kw
 5800.0,2008,Manuál,Diesel,311647,130
 ,2008,Manuál,Benzín,201000,125
 5900.0,2011,Manuál,Diesel,243576,105
-5990.0,2009,Manuál,Diesel,174424,85
 5999.0,2008,Manuál,Benzín,160000,105
 6000.0,2010,Automat,Benzín,153000,90
 6100.0,2011,Manuál,Benzín,70307,90
@@ -149,8 +148,8 @@ price,year,trans,fuel,km,kw
 9900.0,2016,Manuál,Diesel,227689,85
 9990.0,2011,Automat,Diesel,246496,105
 10390.0,2007,Manuál,Benzín,247000,195
-10000.0,2013,Manuál,Diesel,109300,105
 10000.0,2009,Manuál,Benzín,19809,90
+10000.0,2013,Manuál,Diesel,109300,105
 10500.0,2014,Manuál,Diesel,83000,70
 10600.0,2014,Manuál,Diesel,186560,135
 11000.0,2016,Manuál,Diesel,136084,85
@@ -179,7 +178,7 @@ price,year,trans,fuel,km,kw
 13500.0,2016,Manuál,Benzín,63000,80
 13500.0,2016,Manuál,Diesel,138900,70
 ,2018,Manuál,Diesel,151324,85
-13990.0,2013,Automat,Diesel,179000,160
+13900.0,2015,Manuál,Benzín,61807,80
 ,2014,Automat,Benzín,102000,125
 13800.0,2016,Manuál,Benzín,178000,80
 14500.0,2016,Automat,Diesel,95000,85

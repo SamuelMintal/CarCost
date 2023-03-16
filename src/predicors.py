@@ -198,7 +198,7 @@ def nn_main():
 
 
 
-def k_nearest_main():
+def main_carcost():
     # Usage example
 
     # True params from dataset
@@ -221,4 +221,4 @@ def k_nearest_main():
 
 if __name__ == "__main__":
     nn_main()
-    k_nearest_main()
+    main_carcost()
