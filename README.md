@@ -56,7 +56,7 @@ As this application is written in Python you will need that installed on your sy
     6.1 Otherwise if you have chosen *Neural Network* method you will see the frame displayed bellow. There you have to enter two things. First being the architecture of the neural network used as the price predictor. Each number must be greater then zero and represents the number of neurons used in that concrete layer. Therefore the amount of white space separated numbers is the number of layers. The Other thing you need to enter is number of epochs for the predictor to be trained for. Then you can press *Start* button.
     | ![frame for entering NN params](./readme_images/nn_enter_params.png) | 
     |:--:| 
-    | Prediction has finished and the predicted price is shown in new window |
+    | Frame for entering neural network parameters |
 
     6.2 
     After pressing it the predictor will start learning and after it is learned it will predict the cost of the car you have entered. You will obtain the result in the same way as you would with the *k-nearest neighours* method. That is via a window with the result as shown bellow.
